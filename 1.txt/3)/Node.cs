@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Zadanie1
@@ -18,13 +18,16 @@ namespace Zadanie1
 
         public void AddChild(Node child)
         {
-            child.SetParent(this);
-            this.Children.Add(child);
+            if (child != null)
+            {
+                child.SetParent(this);
+                this.Children.Add(child);
+            }
         }
         public void AddChild(string _text)
         {
-            Node newChild = new Node(_text);
-            this.AddChild(newChild);
+                Node newChild = new Node(_text);
+                this.AddChild(newChild);
         }
         public void AddChildren(List<Node> children)
         {
@@ -33,16 +36,18 @@ namespace Zadanie1
 
             this.Children.AddRange(children);
         }
-       
+
         public void Print(string pref, bool last)
         {
 
             Console.Write(pref);
-            if (last){
+            if (last)
+            {
                 Console.Write("└─");
                 pref += "  ";
             }
-            else{
+            else
+            {
                 Console.Write("├─");
                 pref += "| ";
             }
