@@ -12,7 +12,7 @@ namespace Zadanie1
             Array.Resize(ref vs, vs.Length + 1);
             vs[vs.Length - 1] = s;
 
-            return vs.Length - 1; //зач это надо 
+            return vs.Length - 1; 
         }
         public void Delete(int pos)
         {
