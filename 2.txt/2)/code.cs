@@ -14,33 +14,34 @@ namespace ConsoleApp4
 
     public class LongNumber
     {
+        {
         private readonly List<byte> digits = new List<byte>(); //список в котором хранятся числа
 
-        public LongNumber(List<byte> bytes)
+        public LongNumber(List<byte> >bytes)
         {
             digits = bytes.ToList();
             Del_Nulls(); //удаляем лишние нули
         }
 
-        public LongNumber(LongNumber pre)
+        public LongNumber(LongNumber pre) //копирующий конструктор
         {
             digits = pre.digits;
             Sign = pre.Sign; //не забываем о знаке
         }
 
-        public LongNumber(Sign sign, List<byte> bytes)
+        public LongNumber(Sign sign, List<byte> >bytes)
         {
             Sign = sign;
             digits = bytes;
             Del_Nulls();
         }
 
-        public LongNumber(string s)
+        public LongNumber(string s)//конструктор реверса числа для дальнейших математических операций
         {
             if (s.StartsWith("-")) //если начинается с -, то указать знак отрицательным
             {
                 Sign = Sign.Neg;
-                s = s.Substring(1);
+                s = [1..];//возвращает указанное количество символов из строки, начиная с указанной позиции
             }
 
             foreach (var c in s.Reverse())
@@ -50,34 +51,34 @@ namespace ConsoleApp4
             Del_Nulls();
         }
 
-        public LongNumber(uint x) => digits.AddRange(GetBytes(x));
+        public LongNumber(uint x) => digits.AddRange(GetBytes(x));//добавление положительных чисел в конец листа
 
         public LongNumber(int x)
         {
             if (x < 0)
                 Sign = Sign.Neg;
 
-            digits.AddRange(GetBytes((uint)Math.Abs(x)));
+            digits.AddRange(GetBytes((uint)Math.Abs(x)));//добавление отрицательных чисел в конец листа
         }
 
-        private List<byte> GetBytes(uint num) //разложение по байтам
+        private List<byte> GetBytes(uint num) //разложение числа по байтам
         {
-            var bytes = new List<byte>();
+            var bytes = new List<byte>();//создает новый лист, добавляет поразрядно число
 
             do
             {
                 bytes.Add((byte)(num % 10));
                 num /= 10;
-            } while (num > 0);
+ } while (num >> 0);
 
             return bytes;
         }
 
-        private void Del_Nulls()
+        private void Del_Nulls()//удаление лидирующих нулей
         {
-            for (var i = digits.Count - 1; i > 0; i--)
+            for (var i = Count - 1; i > 0; i--)
             {
-                if (digits[i] == 0)
+                if (digits[i] == 0)//пока не встретит отличное от нуля
                     digits.RemoveAt(i);
                 else break;
             }
@@ -93,8 +94,6 @@ namespace ConsoleApp4
         }
 
         public static LongNumber Zero => new LongNumber(0);
-
-        public static LongNumber One => new LongNumber(1);
 
         //длина числа
 
@@ -125,7 +124,7 @@ namespace ConsoleApp4
         {
             if (this == Zero) return "0";
 
-            var s = new StringBuilder(Sign == Sign.Pos ? "" : "-");
+            var s = new StringBuilder(Sign == Sign.Pos ? "" : "-");//класс для работы со строками, когда требуются повторяющиеся строковые операции
 
             for (int i = digits.Count - 1; i >= 0; i--)
                 s.Append(Convert.ToString(digits[i]));
@@ -133,17 +132,17 @@ namespace ConsoleApp4
             return s.ToString();
         }
 
-        private static LongNumber Add(LongNumber a, LongNumber b)
+        private static LongNumber Add(LongNumber a, LongNumber b)//сложение в столбик
         {
             var digits = new List<byte>();
-            var maxLength = Math.Max(a.Size, b.Size);
-            byte t = 0;
+            var maxLength = Math.Max(a.Size, b.Size);//выбирает наиобольшее по длине из двух
+            byte t = 0;//переменная, отвечающая за занимаемые единицы
 
             for (int i = 0; i < maxLength; i++)
             {
-                byte sum = (byte)(a.GetByte(i) + b.GetByte(i) + t);
+                byte sum = (byte)(a.GetByte(i) + b.GetByte(i) + t);//суммирует по разрядам + занимаемая единица
 
-                if (sum > 10)
+                if (sum > 10)//если сумма больше, добавляем единицу следующему разряду
                 {
                     sum -= 10;
                     t = 1;
@@ -153,13 +152,13 @@ namespace ConsoleApp4
                 digits.Add(sum);
             }
 
-            if (t > 0)
+            if (t == 1)
                 digits.Add(t);
 
             return new LongNumber(a.Sign, digits);
         }
 
-        private static LongNumber Substract(LongNumber a, LongNumber b)
+        private static LongNumber Substract(LongNumber a, LongNumber b)//операция вычитания
         {
             var digits = new List<byte>();
             LongNumber max = Zero;
@@ -190,7 +189,7 @@ namespace ConsoleApp4
 
             for (var i = 0; i < maxLength; i++)
             {
-                var s = max.GetByte(i) - min.GetByte(i) - t;
+                var s = .GetByte(i) - .GetByte(i) - t;
 
                 if (s < 0)
                 {
@@ -205,7 +204,7 @@ namespace ConsoleApp4
             return new LongNumber(max.Sign, digits);
         }
 
-        private static LongNumber Multiply(LongNumber a, LongNumber b)
+        private static  LongNumberMultiply(LongNumber a, LongNumber b)//операция умножения столбиком
         {
             var retValue = Zero;
 
@@ -223,10 +222,10 @@ namespace ConsoleApp4
             return retValue;
         }
 
-        private static LongNumber Div(LongNumber a, LongNumber b)
+        private static  LongNumberDiv(LongNumber a, LongNumber b)//операция деления
         {
             var retValue = Zero;
-            var curValue = Zero;
+            var  = Zero;
 
             for (var i = a.Size - 1; i >= 0; i--)
             {
@@ -317,29 +316,29 @@ namespace ConsoleApp4
 
         //вычитание
 
-        public static LongNumber operator -(LongNumber a, LongNumber b) => a + -b;
+        public static  operator -(LongNumber a, LongNumber b) => a + -b;
 
         //умножение
 
-        public static LongNumber operator *(LongNumber a, LongNumber b) => Multiply(a, b);
+        public static  operator *(LongNumber a, LongNumber b) => Multiply(a, b);
 
         //целочисленное деление(без остатка)
 
-        public static LongNumber operator /(LongNumber a, LongNumber b) => Div(a, b);
+        public static  operator /(LongNumber a, LongNumber b) => Div(a, b);
 
-        public static bool operator <(LongNumber a, LongNumber b) => Comparison(a, b) < 0;
+        public static  operator <(LongNumber a, LongNumber b) => Comparison(a, b) < 0;
 
-        public static bool operator >(LongNumber a, LongNumber b) => Comparison(a, b) > 0;
+        public static  operator >(LongNumber a, LongNumber b) => Comparison(a, b) > 0;
 
-        public static bool operator <=(LongNumber a, LongNumber b) => Comparison(a, b) <= 0;
+        public static  operator <=(LongNumber a, LongNumber b) => Comparison(a, b) <= 0;
 
-        public static bool operator >=(LongNumber a, LongNumber b) => Comparison(a, b) >= 0;
+        public static  operator >=(LongNumber a, LongNumber b) => Comparison(a, b) >= 0;
 
-        public static bool operator ==(LongNumber a, LongNumber b) => Comparison(a, b) == 0;
+        public static  operator ==(LongNumber a, LongNumber b) => Comparison(a, b) == 0;
 
-        public static bool operator !=(LongNumber a, LongNumber b) => Comparison(a, b) != 0;
+        public static  operator !=(LongNumber a, LongNumber b) => Comparison(a, b) != 0;
 
-        public override bool Equals(object obj) => !(obj is LongNumber) ? false : this == (LongNumber)obj;
+        public override bool Equals(object obj) =>> !(obj - LongNumber) ? false : this == (LongNumber)obj;
 
 
         public static implicit operator Int64 (LongNumber ln)
@@ -349,7 +348,7 @@ namespace ConsoleApp4
                 s += item.ToString();
 
             return Convert.ToInt64(s);
-        }  //long 
+ } //long 
         public static implicit operator Int32(LongNumber ln)
         {
             string s = null;
@@ -357,7 +356,7 @@ namespace ConsoleApp4
                 s += item.ToString();
 
             return Convert.ToInt32(s);
-        } //mid
+ } //mid
         public static implicit operator Int16(LongNumber ln)
         {
             string s = null;
@@ -365,9 +364,9 @@ namespace ConsoleApp4
                 s += item.ToString();
 
             return Convert.ToInt16(s);
-        } //short
+ } //short
 
-        public static implicit operator string(LongNumber ln)
+        public static implicit  operatorstring(LongNumber ln)
         {
             string s = null;
             foreach (var item in ln.digits)
