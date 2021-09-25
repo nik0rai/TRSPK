@@ -256,38 +256,7 @@ namespace ConsoleApp4
             retValue.Sign = a.Sign == b.Sign ? Sign.Pos : Sign.Neg;
 
             return retValue;
-        }
-
-        private static LongNumber Mod(LongNumber a, LongNumber b)
-        {
-            var retValue = Zero;
-            for (var i = a.Size - 1; i >= 0; i--)
-            {
-                retValue += Exp(a.GetByte(i), i);
-                var x = 0;
-                var l = 0;
-                var r = 10;
-
-                while (l <= r)
-                {
-                    var m = (l + r) >> 1;
-                    var cur = b * Exp((byte)m, i);
-
-                    if (cur <= retValue)
-                    {
-                        x = m;
-                        l = m + 1;
-                    }
-                    else r = m - 1;
-                }
-
-                retValue -= b * Exp((byte)x, i);
-            }
-            retValue.Del_Nulls();
-            retValue.Sign = a.Sign == b.Sign ? Sign.Pos : Sign.Neg;
-
-            return retValue;
-        }
+        }   
 
         private static int Comparison(LongNumber a, LongNumber b, bool ignoreSign = false)
         {
@@ -344,11 +313,7 @@ namespace ConsoleApp4
 
         //сложение
 
-        public static LongNumber operator +(LongNumber a, LongNumber b) => a.Sign == b.Sign
-
-        ? Add(a, b)
-
-        : Substract(a, b);
+        public static LongNumber operator +(LongNumber a, LongNumber b) => a.Sign == b.Sign ? Add(a, b) : Substract(a, b);
 
         //вычитание
 
@@ -361,10 +326,6 @@ namespace ConsoleApp4
         //целочисленное деление(без остатка)
 
         public static LongNumber operator /(LongNumber a, LongNumber b) => Div(a, b);
-
-        //остаток от деления
-
-        public static LongNumber operator %(LongNumber a, LongNumber b) => Mod(a, b);
 
         public static bool operator <(LongNumber a, LongNumber b) => Comparison(a, b) < 0;
 
