@@ -15,7 +15,7 @@ namespace Man
             Age = age;
         }
 
-        public virtual string Display() => (nameof(Man) + ' ' + Name + ' ' + Age); /Пара virtual-override для использования метода в других классах с учетом изменений
+        public virtual string Display() => (nameof(Man) + ' ' + Name + ' ' + Age); //Пара virtual-override для использования метода в других классах с учетом изменений
     };
     class Teenager : Man // наследник класса Man 
     {
