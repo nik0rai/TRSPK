@@ -6,7 +6,7 @@ using System.Text;
 namespace ConsoleApp4
 {
 
-    public enum Sign
+    public enum Sign //для обозначения знака числа
     {
         Neg = -1,      
         Pos = 1
@@ -14,18 +14,18 @@ namespace ConsoleApp4
 
     public class LongNumber
     {
-        private readonly List<byte> digits = new List<byte>();
+        private readonly List<byte> digits = new List<byte>(); //список в котором хранятся числа
 
         public LongNumber(List<byte> bytes)
         {
             digits = bytes.ToList();
-            Del_Nulls();
+            Del_Nulls(); //удаляем лишние нули
         }
 
         public LongNumber(LongNumber pre)
         {
             digits = pre.digits;
-            Sign = pre.Sign;
+            Sign = pre.Sign; //не забываем о знаке
         }
 
         public LongNumber(Sign sign, List<byte> bytes)
@@ -37,7 +37,7 @@ namespace ConsoleApp4
 
         public LongNumber(string s)
         {
-            if (s.StartsWith("-"))
+            if (s.StartsWith("-")) //если начинается с -, то указать знак отрицательным
             {
                 Sign = Sign.Neg;
                 s = s.Substring(1);
@@ -60,7 +60,7 @@ namespace ConsoleApp4
             digits.AddRange(GetBytes((uint)Math.Abs(x)));
         }
 
-        private List<byte> GetBytes(uint num)
+        private List<byte> GetBytes(uint num) //разложение по байтам
         {
             var bytes = new List<byte>();
 
