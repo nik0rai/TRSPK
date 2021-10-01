@@ -1,7 +1,4 @@
-using System;
 
-namespace ConsoleApp5
-{
     class Program
     {
         static int Permiter(int[,] arr, int howMany)
@@ -31,4 +28,4 @@ namespace ConsoleApp5
             Console.WriteLine(value: Permiter(arr, size));
         }       
     }
-}
+
