@@ -51,4 +51,14 @@ class ArrEl<TKey, TValue>
 
             return item.Value;
         }
+        
+        public TKey Get(TValue val)
+        {
+            if (val == null) throw new ArgumentNullException(nameof(val));
+
+            var item = _items.SingleOrDefault(i => i.Value.Equals(val)) ??
+                throw new ArgumentException("Element is already exist.", nameof(val));
+
+            return item.Key;
+        }
     }
