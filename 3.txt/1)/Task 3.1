@@ -1,0 +1,34 @@
+﻿using System;
+
+namespace TRSPK_3._1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            int n = 0;
+            int num_MAX = 0, num_MIN = 0;
+
+            Console.WriteLine("Введите размерность массива: ");
+            n = Convert.ToInt32(Console.ReadLine());
+            int[] arr = new int[n];
+
+            Console.Clear();
+
+            Console.WriteLine("Введите значение для верхней границы: ");
+            num_MAX = Convert.ToInt32(Console.ReadLine());
+
+            Console.WriteLine("Введите значения для нижней границы:");
+            num_MIN = Convert.ToInt32(Console.ReadLine());
+
+            Console.WriteLine("Массив: ");
+           
+            for (int i = 0; i < n; i++)     
+            {
+                Random rand = new Random();
+                arr[i] = rand.Next(num_MIN, num_MAX);
+                Console.Write("{0} ", arr[i]);
+            }
+        }
+    }
+}
