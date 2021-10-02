@@ -10,7 +10,7 @@
         /// Добавляет пару ключ и значение.
         /// </summary>
         /// <param name="item">Ключ со значением.</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="DuplicateWaitObjectException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         public void Add(Item<TKey, TValue> item)
         {
@@ -26,7 +26,7 @@
         /// </summary>
         /// <param name="key">Ключ.</param>
         /// <param name="value">Значение.</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="DuplicateWaitObjectException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         public void Add(TKey key, TValue value)
         {
@@ -83,7 +83,7 @@
         /// Получает ключ по значению.
         /// </summary>
         /// <param name="val">Значение.</param>
-        /// <exception cref="Arg"></exception>
+        /// <exception cref="DuplicateWaitObjectException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns>Ключ</returns>
         public TKey Get(TValue val)
