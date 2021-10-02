@@ -33,7 +33,7 @@ namespace Man
 
         public virtual void changeAge (uint age) =>  Age = age;
 
-        public virtual string Display() => (nameof(Man) + ' ' + Name + ' ' + Age); //Пара virtual-override для использования метода в других классах с учетом изменений
+        public override string ToString() => (nameof(Man) + ' ' + Name + ' ' + Age); //Пара virtual-override для использования метода в других классах с учетом изменений
     };
     class Teenager : Man // наследник класса Man 
     {
@@ -60,7 +60,7 @@ namespace Man
             if (age < 13 || age > 19) throw new ArgumentOutOfRangeException(); //Исключение: выход за диапазон допустимых значений
         }
 
-        public override string Display() => (nameof(Teenager) + ' ' + Name + ' ' + Age + " Place of study: " + School); //Пара virtual-override для использования метода в других классах с учетом изменений
+        public override string ToString() => (nameof(Teenager) + ' ' + Name + ' ' + Age + " Place of study: " + School); //Пара virtual-override для использования метода в других классах с учетом изменений
 
     };
     class Worker : Man
@@ -83,6 +83,6 @@ namespace Man
             get { return age; }
         }
 
-        public override string Display() => (nameof(Worker) + ' ' + Name + ' ' + Age + " Place of work: " + Workplace); //Пара virtual-override для использования метода в других классах с учетом изменений
+        public override string ToString() => (nameof(Worker) + ' ' + Name + ' ' + Age + " Place of work: " + Workplace); //Пара virtual-override для использования метода в других классах с учетом изменений
     }; 
 }
