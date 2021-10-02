@@ -20,21 +20,18 @@ namespace Man
                     name = value;
                 }
             }
-            get { return name; }
+            get => name;
         }
     
         public uint Age { get; set; }
 
         public void changeName (string name)
         {
-            Name = name;
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(); //Исключение: поле не может быть пустым
+            Name = name;            
         }
 
-        public virtual void changeAge (uint age)
-        {
-            Age = age;
-        }
+        public virtual void changeAge (uint age) =>  Age = age;
 
         public virtual string Display() => (nameof(Man) + ' ' + Name + ' ' + Age); //Пара virtual-override для использования метода в других классах с учетом изменений
     };
