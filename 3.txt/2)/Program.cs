@@ -5,8 +5,8 @@ namespace Man
 {
     class Man
     {
-        public uint age;
-        public string name;
+        protected uint age;
+        protected string name;
         public string Name
         {
             set
