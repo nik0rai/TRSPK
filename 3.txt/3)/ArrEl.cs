@@ -16,7 +16,7 @@
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
 
-            if (_items.Any(i => i.Key.Equals(item.Key))) throw new ArgumentException("Element is already exist.", nameof(item));
+            if (_items.Any(i => i.Key.Equals(item.Key))) throw new DuplicateWaitObjectException(nameof(item)); //already exists
             
             _items.Add(item); //добавляем данные
         }
@@ -34,7 +34,7 @@
 
             if (value == null) throw new ArgumentNullException(nameof(value));
 
-            if (_items.Any(i => i.Key.Equals(key))) throw new ArgumentException("Element is already exist.", nameof(key));
+            if (_items.Any(i => i.Key.Equals(key))) throw new DuplicateWaitObjectException(nameof(key)); //already exists
 
             //cоздаем новый элемент хранимых данных
             var item = new Item<TKey, TValue>()
@@ -66,7 +66,7 @@
         /// Получает значение по ключу.
         /// </summary>
         /// <param name="key">Ключ.</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="DuplicateWaitObjectException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns>Значение</returns>
         public TValue Get(TKey key)
@@ -74,7 +74,7 @@
             if (key == null) throw new ArgumentNullException(nameof(key));
 
             var item = _items.SingleOrDefault(i => i.Key.Equals(key)) ??
-                throw new ArgumentException("Element is already exist.", nameof(key));
+                throw new DuplicateWaitObjectException(nameof(key)); //already exists
 
             return item.Value;
         }
@@ -83,7 +83,7 @@
         /// Получает ключ по значению.
         /// </summary>
         /// <param name="val">Значение.</param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="Arg"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns>Ключ</returns>
         public TKey Get(TValue val)
@@ -93,6 +93,6 @@
             var item = _items.SingleOrDefault(i => i.Value.Equals(val)) ??
                 throw new ArgumentException("Element is already exist.", nameof(val));
 
-            return item.Key;
+            return item.Key;throw new DuplicateWaitObjectException(nameof(val)); //already exists
         }
     }
