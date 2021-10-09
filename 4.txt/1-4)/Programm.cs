@@ -6,16 +6,8 @@ namespace TRSPK
 {
     class NumberArray
     {
-        public int[] Array
-        {
-            get;
-            set;
-        }
-        public int n
-        {
-            get;
-            set;
-        }
+        public int[] Array {get;set;}
+        public int n {get;set;}
         public void intArray(int N)
         {
             n = N;
