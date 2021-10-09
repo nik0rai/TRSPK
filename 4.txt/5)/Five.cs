@@ -12,10 +12,10 @@ namespace ConsoleApp6
         public event KeyPressEventDelegate DigitKeyPressed;
         public event KeyPressEventDelegate AnyKeyPressed;
 
-        public void ThreeKeyPressedInvoke() => ThreeKeyPressed.Invoke();
-        public void FiveKeyPressedInvoke() => FiveKeyPressed.Invoke();
-        public void DigitKeyPressedInvoke() => DigitKeyPressed.Invoke();
-        public void AnyKeyPressedInvoke() => AnyKeyPressed.Invoke();
+        public void ThreeKeyPressedInvoke() => ThreeKeyPressed?.Invoke();
+        public void FiveKeyPressedInvoke() => FiveKeyPressed?.Invoke();
+        public void DigitKeyPressedInvoke() => DigitKeyPressed?.Invoke();
+        public void AnyKeyPressedInvoke() => AnyKeyPressed?.Invoke();
     }
     class Subscribers
     {
