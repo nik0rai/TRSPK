@@ -30,16 +30,9 @@ namespace ConsoleApp9
         public void CopyArray(out NumberArray to)
         {
             to = new();
-            to.Arr = Arr;
-            Array.Clear(Arr, 0, Arr.Length);
-            
+            to.Arr = Arr;                       
         }
-        public void CopyArray(out int[] to)
-        {
-            to = Arr;
-            Array.Clear(Arr, 0, Arr.Length);
-
-        }
+        public void CopyArray(out int[] to) => to = Arr;
 
     }
 
