@@ -2,170 +2,143 @@ using System;
 using System.Diagnostics;
 
 
-namespace TRSPK
+namespace ConsoleApp9
 {
     class NumberArray
     {
-        public int[] Array {get;set;}
-        public int n {get;set;}
-        public void intArray(int N)
-        {
-            n = N;
-            Array = new int[n];
-        }
-        public int this[int index]
-        {
-            get { return Array[index]; }
-            set { }
-        }
+        public int[] Arr { get; set; }
+
         public void ReadArray()
         {
             Console.WriteLine("Введите элементы:");
-            for (int i = 0; i < Array.Length; i++)
+            for (int i = 0; i < Arr.Length; i++)
             {
-                Console.Write("intArray[{0}] = ", i); Array[i] = Convert.ToInt32(Console.ReadLine());
+                Console.Write("intArray[{0}] = ", i); 
+                Arr[i] = Convert.ToInt32(Console.ReadLine());
             }
         }
-        public void ReadArrayRandom()
+        public void FillArrayRandom()
         {
-            Random rand = new Random();
-            for (int i = 0; i < Array.Length; i++)
-            {
-                Array[i] = rand.Next(100);
-            }
+            Random rand = new ();
+
+            for (int i = 0; i < Arr.Length; i++)
+                Arr[i] = rand.Next(100);    
         }
-        public void GetUnit(int[] arr)
+
+        public int GetUnit(uint index) => (index < Arr.Length) ? Arr[index] : throw new IndexOutOfRangeException(nameof(index));
+        public object SetUnit(int[] arr, uint index) => (index < arr.Length) ? arr[index] : throw new ArgumentOutOfRangeException(nameof(index));
+        public void CopyArray(out NumberArray to)
         {
-            Console.WriteLine("Введите номер элемента: ");
-            int Index = Convert.ToInt32(Console.ReadLine());
-            Console.WriteLine("Значение данного элемента: " + arr[Index]);
+            to = new();
+            to.Arr = Arr;
+            Array.Clear(Arr, 0, Arr.Length);
+            
         }
-        public void SetUnit(int[] arr)
+        public void CopyArray(out int[] to)
         {
-            Console.WriteLine("Введите номер элемента: ");
-            int Index = Convert.ToInt32(Console.ReadLine());
-            Console.Clear();
-            Console.WriteLine("Введите новое значение для элемента");
-            arr[Index] = Convert.ToInt32(Console.ReadLine());
+            to = Arr;
+            Array.Clear(Arr, 0, Arr.Length);
+
         }
-        public void CopyArray(int[] arr, NumberArray Array)
-        {
-            Array.Array = arr;
-        }
+
     }
 
 
     class Sorting
     {
-        static void Swap(ref int i, ref int j)
+        private static void Swap(ref int x, ref int y) => (x, y) = (y, x);
+        public static int[] InsertionSort(NumberArray numbers)
         {
-            var temp = i;
-            i = j;
-            j = temp;
-        }
+            int x, j;
 
-
-        static int[] InsertionSort(NumberArray numbers) //вставки
-        {
-            int x;
-            int j;
-            for (int i = 1; i < numbers.n; i++)
+            for (int i = 0; i < numbers.Arr.Length; i++)
             {
-                x = numbers[i];
+                x = numbers.Arr[i];
                 j = i;
-                while (j > 0 && numbers[j - 1] > x)
+                while (j > 0 && numbers.Arr[j - 1] > x)
                 {
-                    Swap(ref numbers.Array[j], ref numbers.Array[j - 1]);
+                    Swap(ref numbers.Arr[j], ref numbers.Arr[j - 1]);
                     j -= 1;
                 }
-                numbers[j] = x;
+                numbers.Arr[j] = x;
             }
-            return numbers.Array;
+            return numbers.Arr;
         }
 
 
-        static int Partition(int[] numbers, int minIndex, int maxIndex)
+        public static int Partition(int[] numbers, int left, int right)
         {
-            var p = minIndex - 1;
-            for (var i = minIndex; i < maxIndex; i++)
+            var p = left - 1;
+            for (var i = left; i < right; i++)
             {
-                if (numbers[i] < numbers[maxIndex])
+                if (numbers[i] < numbers[right])
                 {
                     p++;
                     Swap(ref numbers[p], ref numbers[i]);
                 }
             }
             p++;
-            Swap(ref numbers[p], ref numbers[maxIndex]);
+            Swap(ref numbers[p], ref numbers[right]);
             return p;
         }
-
-
-        //быстрая сортировка
-        static int[] QuickSort(int[] numbers, int minIndex, int maxIndex)
+        public static int[] QuickSort(int[] numbers, int left, int right)
         {
-            {
-                if (minIndex >= maxIndex)
-                    return numbers;
-
-                var pIndex = Partition(numbers, minIndex, maxIndex);
-                QuickSort(numbers, minIndex, pIndex - 1);
-                QuickSort(numbers, pIndex + 1, maxIndex);
+            if (left >= right)
                 return numbers;
-            }
+            
+            var pIndex = Partition(numbers, left, right);
+            QuickSort(numbers, left, pIndex - 1);
+            QuickSort(numbers, pIndex + 1, right);
+            return numbers;         
         }
-
-
-        static int[] QuickSort(NumberArray numbers)
-        {
-            return QuickSort(numbers.Array, 0, numbers.n - 1);
-        }
-
+        public static int[] QuickSort(NumberArray numbers) => QuickSort(numbers.Arr, 0, numbers.Arr.Length - 1);
+        
 
         public delegate int[] SortDelegate(NumberArray Array);
-        class Program
+        internal class Program
         {
             static void Main()
             {
-                Console.Write("N = ");
-                var len = Convert.ToInt32(Console.ReadLine());
-                NumberArray num = new NumberArray();
-                num.intArray(len);
-                num.ReadArrayRandom();
-                for (int i = 0; i < num.n; i++)
-                {
-                    Console.WriteLine(num[i]);
-                }
-                SortDelegate funct1 = new SortDelegate(QuickSort);
-                SortDelegate funct2 = new SortDelegate(InsertionSort);
-                Stopwatch stopwatch = new Stopwatch();
-                Console.WriteLine("Выберите вариант сортировки:\n 1. Быстрая сортировка\n 2. Сортировка вставками");
-                string selection = Console.ReadLine();
+                Console.Write("Enter size of array: ");
+                int len = Convert.ToInt32(Console.ReadLine());
+
+                NumberArray num = new ();
+                num.Arr = new int[len];
+                num.FillArrayRandom();
+
+                foreach (var item in num.Arr)
+                    Console.WriteLine(item);
+
+
+                SortDelegate _quickSort = new (QuickSort);
+                SortDelegate _insertionSort = new (InsertionSort);
+                Stopwatch stopwatch = new ();
+
+                Console.WriteLine("Select sorting alorithm:\n 1. Quick sort\n 2. Insertion sort");
+                char selection = Console.ReadKey().KeyChar;
                 switch (selection)
                 {
-                    case "1":
+                    case '1':
                         stopwatch.Start();
-                        funct1(num);
+                        _quickSort(num);
                         stopwatch.Stop();
                         break;
-                    case "2":
+                    case '2':
                         stopwatch.Start();
-                        funct2(num);
+                        _insertionSort(num);
                         stopwatch.Stop();
                         break;
                     default:
-                        Console.WriteLine("Такой команды не существует");
+                        Console.WriteLine("Command error, not existing command!");
                         break;
                 }
 
-                Console.WriteLine("Упорядоченный массив: ");
-                for (int i = 0; i < num.n; i++)
-                {
-                    Console.WriteLine(num[i]);
-                }
-                Console.WriteLine("Time: " + stopwatch.ElapsedTicks);
+                Console.WriteLine("Sorted array: ");
+                foreach (var item in num.Arr)
+                    Console.WriteLine(item);                
+       
+                Console.WriteLine("Elapsed time: {0}ms", stopwatch.Elapsed.TotalMilliseconds);
             }
         }
     }
 }
-
