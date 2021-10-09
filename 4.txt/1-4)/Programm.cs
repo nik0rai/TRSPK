@@ -26,7 +26,7 @@ namespace ConsoleApp9
         }
 
         public int GetUnit(uint index) => (index < Arr.Length) ? Arr[index] : throw new IndexOutOfRangeException(nameof(index));
-        public object SetUnit(int[] arr, uint index) => (index < arr.Length) ? arr[index] : throw new ArgumentOutOfRangeException(nameof(index));
+        public object SetUnit(uint index, int value) => (index < Arr.Length) ? Arr[index] = value : throw new ArgumentOutOfRangeException(nameof(index));
         public void CopyArray(out NumberArray to)
         {
             to = new();
