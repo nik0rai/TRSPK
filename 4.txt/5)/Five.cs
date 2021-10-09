@@ -53,7 +53,7 @@ namespace ConsoleApp6
 
         public static void AnyKeyPressed()
         {
-            string path = @"log.txt";
+            string path = @"log.txt"; //Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DescktopDirectory),"log.txt");
             using StreamWriter txt = File.CreateText(path);
             txt.Dispose();
             if (File.Exists(path))
