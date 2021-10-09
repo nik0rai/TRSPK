@@ -42,12 +42,9 @@ namespace ConsoleApp9
         private static void Swap(ref int x, ref int y) => (x, y) = (y, x);
         public static int[] InsertionSort(NumberArray numbers)
         {
-            int x, j;
-
             for (int i = 0; i < numbers.Arr.Length; i++)
             {
-                x = numbers.Arr[i];
-                j = i;
+                int x = numbers.Arr[i], j = i;
                 while (j > 0 && numbers.Arr[j - 1] > x)
                 {
                     Swap(ref numbers.Arr[j], ref numbers.Arr[j - 1]);
