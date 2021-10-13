@@ -7,28 +7,26 @@ namespace Intern
     {
         static void Main(string[] args)
         {
+
             var a = "aasd fghjk";
             var b = "qawe rty";
-
-            bool equals = false;
             var stopwatch = Stopwatch.StartNew();
-            for (int i = 0; i <Math.Max(a.Length,b.Length) ; i++)
+            for (int i = 0; i < Math.Max(a.Length, b.Length); i++)
             {
-                if (a == b) equals=true;
+                object.ReferenceEquals(a, b);
             }
+
             stopwatch.Stop();
-            string.Intern("aasdf ghjk");
-            string.Intern("qawe rty");
-            equals = false;
+            string.Intern(a);
+            string.Intern(b);
             var stopwatch1 = Stopwatch.StartNew();
             for (int i = 0; i < Math.Max(a.Length, b.Length); i++)
             {
-                if (a == b) equals = true;
+                object.ReferenceEquals(a, b);
             }
             stopwatch1.Stop();
-            Console.WriteLine(stopwatch.Elapsed.TotalMilliseconds + " - " + equals);
-            Console.WriteLine(stopwatch1.Elapsed.TotalMilliseconds + " - " + equals);
-            Console.WriteLine(stopwatch.Elapsed.TotalMilliseconds/stopwatch1.Elapsed.TotalMilliseconds);
+            Console.WriteLine(stopwatch.Elapsed.TotalMilliseconds + " - " + object.ReferenceEquals(a, b));
+            Console.WriteLine(stopwatch1.Elapsed.TotalMilliseconds + " - " + object.ReferenceEquals(a, b));
         }
     }
 }
