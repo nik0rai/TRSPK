@@ -7,7 +7,6 @@ namespace Intern
     {
         static void Main(string[] args)
         {
-
             var a = "aasd fghjk";
             var b = "qawe rty";
 
@@ -17,7 +16,6 @@ namespace Intern
             {
                 if (a == b) equals=true;
             }
-
             stopwatch.Stop();
             string.Intern("aasdf ghjk");
             string.Intern("qawe rty");
@@ -32,7 +30,5 @@ namespace Intern
             Console.WriteLine(stopwatch1.Elapsed.TotalMilliseconds + " - " + equals);
             Console.WriteLine(stopwatch.Elapsed.TotalMilliseconds/stopwatch1.Elapsed.TotalMilliseconds);
         }
-
-
     }
 }
