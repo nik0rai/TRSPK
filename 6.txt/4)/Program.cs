@@ -21,10 +21,6 @@ namespace _6._4
             Console.WriteLine(enums);
 
             Console.WriteLine(Enum.Parse(typeof(Group), "31").ToString());      //31 = 2^5 - 2^0
-
-
-
-
         }
     }
 }
