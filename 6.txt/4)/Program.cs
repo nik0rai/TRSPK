@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace _6._4
 {
@@ -15,7 +15,6 @@ namespace _6._4
     {
         static void Main(string[] args)
         {
-
             var enums = (Group.Arina | Group.Marina | Group.Nikolay |
                          Group.MarkWolf | Group.Anna).ToString();
             Console.WriteLine(enums);
