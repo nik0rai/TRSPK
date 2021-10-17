@@ -3,44 +3,56 @@
     {
       "flight_id": "NP-123",
       "type": 1,
-      "date": "2019-07-26T00:00:00"
+      "date": "2019-07-26T00:00:00",
+      "status": 5,
+      "onboard_passangers": 135,
+      "lethals": 3
     },
-    {
-      "flight_id": "NP-233",
-      "type": 0,
-      "date": "2020-02-12T00:00:00"
-    },
-    {
-      "flight_id": "AP-023",
-      "type": 3,
-      "date": "2012-07-16T00:00:00"
-    },
-    {
-     "flight_id": "QPZ-143",
-      "type": 1,
-     "date": "2019-12-16T00:00:00"
-    }
-  ],
-  "status":[
     {
       "flight_id": "NP-123",
-      "type": 1,
-      "date": "2019-05-22T00:00:00"
+      "type": 22,
+      "date": "2019-07-26T00:00:00",
+      "status": 10,
+      "onboard_passangers": 235,
+      "lethals": 0
     },
     {
-      "flight_id": "NP-233",
+      "flight_id": "NP-223",
+      "type": 11,
+      "date": "2012-02-11T00:00:00",
+      "status": 0,
+      "onboard_passangers": 255,
+      "lethals": 253
+    },
+    {
+      "flight_id": "AP-193",
       "type": 0,
-      "date": "2019-07-26T00:00:00"
+      "date": "2019-07-26T00:00:00",
+      "status": 8,
+      "onboard_passangers": 115,
+      "lethals": 0
+    }
+  ],
+  "park":[
+    {
+      "type": 1,
+      "seats": 150,
+      "ammount": 5
     },
     {
-      "flight_id": "AP-023",
-      "type": 1,
-      "date": "2019-07-26T00:00:00"
+      "type": 11,
+      "seats": 250,
+      "ammount": 7
     },
     {
-     "flight_id": "QPZ-143",
-      "type": 1,
-     "date": "2019-07-26T00:00:00"
+      "type": 22,
+      "seats": 200,
+      "ammount": 2
+    },
+    {
+      "type": 0,
+      "seats": 121,
+      "ammount": 12
     }
   ]
 }
