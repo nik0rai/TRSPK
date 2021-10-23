@@ -611,7 +611,7 @@ namespace TrainCsharp
                                         var ans = filter.Ammount(type, day, amm);
                                         if (ans == -1)
                                             Console.WriteLine("We cannot find any models to reserve from the park. Maybe we don`t have this model.");
-                                        Console.WriteLine($"You should reserve: {ans}");
+                                        else Console.WriteLine($"You should reserve: {ans}");
                                     }
 
                                     else
