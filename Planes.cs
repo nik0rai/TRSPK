@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace TrainCsharp
+namespace ConsoleApp7
 {
     #region Logic
     enum PlaneType
@@ -45,9 +45,9 @@ namespace TrainCsharp
         //invalidType //если указано выше 32 или ниже 0
     }
 
+    [Serializable]
     class Flight
     {
-
         [JsonProperty("Base_id")]
         public int base_id { get; set; } //id в базе данных
 
@@ -64,14 +64,14 @@ namespace TrainCsharp
         public int Status { get; set; } //оценка качества самолета
 
         [JsonProperty("onboard_passangers")]
-        public int Passangers { get; set; } //кол-во пассажиров на самолете
+        public int Passengers { get; set; } //кол-во пассажиров на самолете
 
         [JsonProperty("lethals")]
-        public int Deaths { get; set; } //смертей во время перелета   
+        public int Deaths { get; set; } //смертей во время перелета
 
         public override string ToString() => '#' + Id + ", Type = " + Type +
             ", Day = " + Date.Day + ", Status = " + Status +
-            ", Passengers = " + Passangers + ", RIP = " + Deaths;       
+            ", Passengers = " + Passengers + ", RIP = " + Deaths;
     }
 
     class ParkInfo
@@ -84,6 +84,8 @@ namespace TrainCsharp
 
         [JsonProperty("ammount")] //всего этой модели
         public int Count { get; set; }
+
+        public override string ToString() => $"Type = {Type} Seats = {Seats} Count = {Count}";
     }
 
     class Filter
@@ -99,10 +101,11 @@ namespace TrainCsharp
         /// </summary>
         /// <param name="Descending">When false => least deadliest days </param>
         /// <returns></returns>
-        public Dictionary<int, int> DeadliestDays(bool Descending = true) {
+        public Dictionary<int, int> DeadliestDays(bool Descending = true)
+        {
 
             Dictionary<int, int> top_days = new(); //от самых смертельных дней
-            
+
             foreach (var item in array.Distinct().OrderByDescending(x => x.Deaths))
                 if (!top_days.ContainsKey(item.Date.Day))
                     top_days.Add(item.Date.Day, array.Where(x => x.Date.Day == item.Date.Day).Sum(x => x.Deaths));
@@ -124,11 +127,11 @@ namespace TrainCsharp
 
             foreach (var item in array.Distinct().OrderByDescending(x => x.Status))
                 if (!quality.ContainsKey(item.Type))
-                    {
-                        int sum = array.Where(x => x.Type == item.Type).Sum(x => x.Status);
-                        int ammount = array.Where(x => x.Type == item.Type).Count();
-                        quality.Add(item.Type, (sum / ammount)); //по среднем значению
-                    }
+                {
+                    int sum = array.Where(x => x.Type == item.Type).Sum(x => x.Status);
+                    int ammount = array.Where(x => x.Type == item.Type).Count();
+                    quality.Add(item.Type, (sum / ammount)); //по среднем значению
+                }
 
             if (!Descending) quality = quality.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 
@@ -140,7 +143,7 @@ namespace TrainCsharp
         /// </summary>
         /// <param name="Descending">When false => most breakable days </param>
         /// <returns></returns>
-        public Dictionary<int,int> LeastBreakableDays(bool Descending = true)
+        public Dictionary<int, int> LeastBreakableDays(bool Descending = true)
         {
             Dictionary<int, int> breakable = new(); //дни где меньше всего поломок
             foreach (var item in array.Distinct().OrderByDescending(x => x.Status))
@@ -194,12 +197,12 @@ namespace TrainCsharp
             else
             {
                 ans /= (matchedDays.First().Value.Chance != 0) ? matchedDays.First().Value.Chance : 0.05;
-                return Convert.ToInt32(Math.Ceiling(ans));         
-            }        
+                return Convert.ToInt32(Math.Ceiling(ans));
+            }
         }
 
-        private readonly LinkedList<ParkInfo> list;
-        private readonly LinkedList<Flight> array;
+        public LinkedList<ParkInfo> list;
+        public LinkedList<Flight> array;
     }
 
     class Probe
@@ -212,274 +215,156 @@ namespace TrainCsharp
     }
     #endregion
 
-    #region CRUD
-    class CRUD<T>
+    class CRUD
     {
-        public CRUD(string db = "events.json") => DB = db;
-        public LinkedList<T> Read()
+        public CRUD(LinkedList<Flight> _array, string _DB = "event.json") { array = _array; DB = _DB; }
+        public CRUD (string _DB = "event.json") { array = new(); DB = _DB; }
+
+        /// <summary>
+        /// Create item in json file
+        /// </summary>
+        /// <param name="fl">Type Flight</param>
+        /// <returns></returns>
+        public LinkedList<Flight> Create(Flight fl)
         {
-            LinkedList<T> Next = new();
+            fl.base_id = array.Count + 1;
+            
             if (File.Exists(DB))
             {
-                string reader = File.ReadAllText(DB);
-                Next = JsonConvert.DeserializeObject<LinkedList<T>>(reader);
-                
+                array = Read();
+                array.AddLast(fl);
+                File.WriteAllText(DB, string.Empty);
+                File.WriteAllText(DB, JsonConvert.SerializeObject(array));
             }
-            return Next;
+            else using (StreamWriter sw = File.CreateText(DB))
+                {
+                    array.AddLast(fl);
+                    sw.Write(JsonConvert.SerializeObject(array));
+                    sw.Close();
+                }
+
+            return array;
         }
 
-        public void Add(Flight Next)
+        /// <summary>
+        /// Read json file
+        /// </summary>
+        /// <returns>LinkedList<Flight>array</returns>
+        public LinkedList<Flight> Read()
         {
-            JsonSerializer serializer = new();
+            if (File.Exists(DB))
+                return JsonConvert.DeserializeObject<LinkedList<Flight>>(File.ReadAllText(DB));
 
-            if (!File.Exists(DB))
-            {
-                var file = File.Create(DB);
-                file.Close();
-            }
-            using StreamReader streamReader = new(DB);
-
-            string iter = streamReader.ReadLine();
-            bool first = (iter != null) ? iter[0].Equals('[') : false;
-
-            string secondIter = streamReader.ReadToEnd();
-            bool last = (secondIter.Length != 0) ? secondIter[^1].Equals(']') : false;
-
-            streamReader.Close();
-
-            int i = 0;
-            using (StreamReader sr = new(DB))
-            {
-                String line;
-                while ((line = sr.ReadLine()) != null)
-                    i++;
-
-            }
-
-            string[] tempStr = File.ReadAllLines(DB);
-
-            if (i == 0)
-                Next.base_id = i + 1;
-            else
-                Next.base_id = i - 1;
-
-            if (!first && !last)
-            {
-                StreamWriter text = new StreamWriter(DB, true);
-                text.WriteLine('[');
-                using JsonWriter writer = new JsonTextWriter(text);
-                serializer.Serialize(writer, Next);
-                text.WriteLine(',');
-                text.Write(']');
-                text.Close();
-            }
-
-            if (last)
-            {
-                string[] readText = File.ReadAllLines(DB);
-                string[] writeText = new string[readText.Length - 1];
-                Array.Copy(readText, 0, writeText, 0, readText.Length - 1);
-                File.WriteAllLines(DB, writeText);
-
-                StreamWriter text = new(DB, true);
-                using JsonWriter writer = new JsonTextWriter(text);
-                serializer.Serialize(writer, Next);
-                text.WriteLine(',');
-                text.Write(']');
-                text.Close();
-            }
+            else return array;
         }
 
-        public void Delete(int num)
-        {                  
-            string str = "";
-
-            if (!File.Exists(DB + "help.json"))
-            {
-                var file = File.Create(DB + "help.json");
-                file.Close();
-            }
-
-            string[] readText = File.ReadAllLines(DB);
-            string[] writeText = new string[num];
-            Array.Copy(readText, 0, writeText, 0, num);
-            File.WriteAllLines(DB + "help.json", writeText);
-
-            for (int i = 0; i <= num; i++)
-            {
-                using (StreamReader sr = new(@DB))
-                {
-                    sr.ReadLine(); //читаем первую строку
-                    str = sr.ReadToEnd(); //записываем все остальные строки
-                }
-                using (StreamWriter sw = new(@DB))
-                {
-                    sw.WriteLine(str); //перезаписываем содержимое фала
-                }
-            }
-
-            using (StreamReader sr = new(DB))
-            {
-                str = sr.ReadToEnd();
-            }
-            using (StreamWriter swrite = new(DB + "help.json", true))
-            {
-                swrite.WriteLine(str);
-            }
-
-            using (StreamReader sr = new(DB + "help.json"))
-            {
-                str = sr.ReadToEnd();
-            }
-            using (StreamWriter sw = new(DB))
-            {
-                sw.WriteLine(str);
-            }
-        }
-
-        public void Update(int k, string help)
+        /// <summary>
+        /// Update value which goes by index.
+        /// </summary>
+        /// <param name="index">index of value</param>
+        /// <param name="selector">id, type, date, status, passangers, rip</param>
+        /// <returns>LinkedList<Flight>array</returns>
+        public LinkedList<Flight> Update(int index, string selector) 
         {
-            if (!File.Exists(DB))
+            if (File.Exists(DB))
             {
-                Console.WriteLine("У вас нет событий"); 
+                if (array.Count == 0) return array;
+
+                 array = Read();              
+                 var item = array.Where(x => x.base_id.Equals(index)).First();
+                 switch (selector)
+                    {
+                        case "id":
+                            Console.Write("Change flight id: ");
+                            array.Find(item).Value.Id = Console.ReadLine();
+                            break;
+                        case "type":
+                            {
+                            var read = Console.ReadLine();
+                            if (Enum.TryParse(read, out PlaneType type))
+                                    if (Enum.IsDefined(typeof(PlaneType), type) | type.ToString().Contains(","))
+                                    {
+                                        array.Find(item).Value.Type = type;
+                                    }
+
+                                    else
+                                        Console.WriteLine("{0} is not an underlying value of the types enumeration.", read);
+                                else
+                                    Console.WriteLine("{0} is not a member of the types enumeration.", read);
+                            }
+                            break;
+                        case "date":
+                            Console.Write("Change date (exmpl: 2008,06,25): ");
+                            var values = Console.ReadLine().Split(',');
+                            array.Find(item).Value.Date = new DateTime(Convert.ToInt32(values[0]), Convert.ToInt32(values[1]), Convert.ToInt32(values[2]));
+                            break;
+                        case "status":
+                            {
+                                again:
+                                Console.Write("Change status of the fluight: ");
+                                var temp = Convert.ToInt32(Console.ReadLine());
+                                if (temp < 0 || temp > 10)
+                                {
+                                    Console.WriteLine("Error value can be only in range 0-10! Try again!");
+                                    goto again;
+                                }
+                                else array.Find(item).Value.Status = temp;
+                            }
+                            break;
+                        case "passangers":
+                            dela:
+                            Console.Write("Enter new ammount of passangers: ");
+                            var sel = Convert.ToInt32(Console.ReadLine());
+                            if (sel < 0)
+                            {
+                                Console.WriteLine("Ammount can`t be negative! Try again!");
+                                goto dela;
+                            }
+                            else array.Find(item).Value.Passengers = sel;
+                            break;
+                        case "rip":
+                            Console.Write("Enter new ammount of casualties: ");
+                            var sele = Convert.ToInt32(Console.ReadLine());
+                            if (sele < 0)
+                            {
+                                Console.WriteLine("Casualties can`t be negative! Try again!");
+                                goto dela;
+                            }
+                            else array.Find(item).Value.Deaths = sele;
+                            break;
+                        default:
+                            break;
+                    }
+                 File.WriteAllText(DB, string.Empty); //empty file
+                 File.WriteAllText(DB, JsonConvert.SerializeObject(array));                           
             }
-
-            Console.WriteLine("Какое событие вы хотите редактировать?");
-            int num = Convert.ToInt32(Console.ReadLine());
-            string str = "";
-
-            if (!File.Exists(DB + "help2.json"))
-            {
-                var file = File.Create(DB + "help2.json");
-                file.Close();
-            }
-
-            if (!File.Exists(DB + "edit.json"))
-            {
-                var file = File.Create(DB + "edit.json");
-                file.Close();
-            }
-
-            string[] readText = File.ReadAllLines(DB);                      //
-            string[] writeText = new string[num];                           //  Сохранение текста до num-строки
-            Array.Copy(readText, 0, writeText, 0, num);                     //
-            File.WriteAllLines(DB + "help2.json", writeText);               //
-
-            for (int i = 0; i < num; i++)
-            {
-                using (StreamReader sr = new StreamReader(DB))
-                {
-                    sr.ReadLine();
-                    str = sr.ReadToEnd();
-                }
-                using (StreamWriter sw = new StreamWriter(DB))
-                {
-                    sw.WriteLine(str);
-                }
-            }
-
-            //Переносим редактируемую строку в другой файл
-            using (StreamReader sreader = new StreamReader(DB))
-            {
-                str = sreader.ReadLine();
-            }
-            using (StreamWriter swriter = new StreamWriter(DB + "edit.json"))
-            {
-                swriter.Write(str);
-            }
-
-            using (StreamReader sreader = new StreamReader(DB + "edit.json"))
-            {
-                str = sreader.ReadLine()[0..^1]; //Создать подстроку от 0 до length-1(^1 ==> length - 1)
-                //Console.WriteLine(str);
-            }
-            using (StreamWriter swriter = new StreamWriter(DB + "edit.json"))
-            {
-                swriter.Write(str);
-            }
-
-
-            /*string[] readText1 = File.ReadAllLines(@"jsonedit.txt");
-            string[] writeText1 = new string[readText.Length - 1];
-            Array.Copy(readText1, 0, writeText1, 0, readText1.Length - 1);
-            File.WriteAllLines(@"jsonedit.txt", writeText1);*/
-
-
-            string json = File.ReadAllText(DB + "edit.json");
-            dynamic jsonObj = JsonConvert.DeserializeObject(json);
-
-            switch (k)
-            {
-                case 1:                  
-                    jsonObj["flight_id"] = help;
-                    string output = JsonConvert.SerializeObject(jsonObj);
-                    File.WriteAllText(DB + "edit.json", output);
-                    break;
-                case 2:                  
-                    jsonObj["type"] = help;
-                    string output1 = JsonConvert.SerializeObject(jsonObj);
-                    File.WriteAllText(DB + "edit.json", output1);
-                    break;
-                case 3:                   
-                    string help1 = Console.ReadLine();
-                    string help2 = Console.ReadLine();
-                    jsonObj["date"] = help + "-" + help1 + "-" + help2 + "T00:00:00";
-                    string output2 = JsonConvert.SerializeObject(jsonObj);
-                    File.WriteAllText(DB + "edit.json", output2);
-                    break;
-                case 4:                   
-                    jsonObj["status"] = help;
-                    string output3 = JsonConvert.SerializeObject(jsonObj);
-                    File.WriteAllText(DB + "edit.json", output3);
-                    break;
-                case 5:                
-                    jsonObj["onboard_passangers"] = help;
-                    string output4 = JsonConvert.SerializeObject(jsonObj);
-                    File.WriteAllText(DB + "edit.json", output4);
-                    break;
-                case 6:                  
-                    jsonObj["lethals"] = help;
-                    string output5 = JsonConvert.SerializeObject(jsonObj);
-                    File.WriteAllText(DB + "edit.json", output5);
-                    break;
-                default:                   
-                    break;
-            }
-
-            using (StreamReader sr = new StreamReader(DB + "edit.json"))
-            {
-                str = sr.ReadLine();
-            }
-            using (StreamWriter sw = new StreamWriter(DB + "help2.json", true))
-            {
-                sw.WriteLine(str + ',');
-            }
-
-
-            using (StreamReader sr = new StreamReader(DB))
-            {
-                sr.ReadLine(); //читаем первую строку
-                str = sr.ReadToEnd(); //записываем все остальные строки
-            }
-            using (StreamWriter sw = new StreamWriter(DB + "help2.json", true))
-            {
-                sw.WriteLine(str); //перезаписываем содержимое фала
-            }
-
-            using (StreamReader sr = new StreamReader(DB + "help2.json"))
-            {
-                str = sr.ReadToEnd();
-            }
-            using (StreamWriter sw = new StreamWriter(DB))
-            {
-                sw.WriteLine(str);
-            }
-
+            return array;
         }
 
-        private readonly string DB;
+        /// <summary>
+        /// Delets item in json by uniq index 
+        /// </summary>
+        /// <param name="index">Index</param>
+        /// <returns></returns>
+        public LinkedList<Flight> Delete(int index)
+        {
+            if (File.Exists(DB))
+            {
+                //if (array.Count == 0) return array;
+
+                 array = Read();                 
+                 var item = array.Where(x => x.base_id.Equals(index)).First();
+                 array.Remove(item); // remove object from array
+                 File.WriteAllText(DB, string.Empty); //empty file
+                 File.WriteAllText(DB, JsonConvert.SerializeObject(array));                
+            }
+            return array;
+        }
+
+
+        public LinkedList<Flight> array;
+        public string DB;
     }
-    #endregion
 
     class Program
     {
@@ -487,7 +372,7 @@ namespace TrainCsharp
         {
             Console.WriteLine("0: Top deadliest days." +
                               "\n1: Top safiest days." +
-                              "\n2: Top best models."  +
+                              "\n2: Top best models." +
                               "\n3: Top worst models." +
                               "\n4: Top breakable days." +
                               "\n5: Top not breakable days." +
@@ -502,15 +387,14 @@ namespace TrainCsharp
 
         static void Main()
         {
-            LinkedList<Flight> flights = new(new CRUD<Flight>().Read());
-            LinkedList<ParkInfo> list = new(new CRUD<ParkInfo>("park.json").Read());
-
             bool isRunning = true;
+            LinkedList<Flight> flights = new(new CRUD().Read());
+            LinkedList<ParkInfo> list = JsonConvert.DeserializeObject<LinkedList<ParkInfo>>(File.ReadAllText("park.json"));            
             Filter filter = new(flights, list);
 
             Help();
             do
-            {            
+            {
                 Console.Write(">> "); int selected = Convert.ToInt32(Console.ReadLine());
                 switch (selected)
                 {
@@ -555,10 +439,11 @@ namespace TrainCsharp
                         break;
                     case 3:
                         {
-                            if (flights.Count != 0)
+                            if (filter.list.Count != 0)
                             {
                                 Console.WriteLine("\nTop worst models:\n---------------------------");
                                 var b = filter.BestModels(false);
+                                Console.WriteLine(b.Count);
                                 foreach (var item in b)
                                     Console.WriteLine(item.Key);
                                 Console.WriteLine("---------------------------");
@@ -573,7 +458,7 @@ namespace TrainCsharp
                                 Console.WriteLine("\nMost breakable days:\n---------------------------");
                                 var cc = filter.LeastBreakableDays(false);
                                 foreach (var item in cc)
-                                    Console.WriteLine(item);
+                                    Console.WriteLine(item.Key);
                                 Console.WriteLine("---------------------------");
                             }
                             else Console.WriteLine("Empty!");
@@ -586,7 +471,7 @@ namespace TrainCsharp
                                 Console.WriteLine("\nLeast breakable days:\n---------------------------");
                                 var c = filter.LeastBreakableDays();
                                 foreach (var item in c)
-                                    Console.WriteLine(item);
+                                    Console.WriteLine(item.Key);
                                 Console.WriteLine("---------------------------");
                             }
                             else Console.WriteLine("Empty!");
@@ -602,16 +487,16 @@ namespace TrainCsharp
                                 Console.WriteLine("---------------------------");
 
                                 Console.Write("Enter desiered model: "); var read = Console.ReadLine();
-                                Console.WriteLine("Enter day of flight: "); int day = Convert.ToInt32(Console.ReadLine());
-                                Console.WriteLine("Enter how much passengers will be on flight: "); int amm = Convert.ToInt32(Console.ReadLine());
-                                PlaneType type;
-                                if (Enum.TryParse(read, out type))
+                                Console.Write("Enter day of flight: "); int day = Convert.ToInt32(Console.ReadLine());
+                                Console.Write("Enter how much passengers will be on flight: "); int amm = Convert.ToInt32(Console.ReadLine());
+                                if (Enum.TryParse(read, out PlaneType type))
                                     if (Enum.IsDefined(typeof(PlaneType), type) | type.ToString().Contains(","))
                                     {
                                         var ans = filter.Ammount(type, day, amm);
                                         if (ans == -1)
                                             Console.WriteLine("We cannot find any models to reserve from the park. Maybe we don`t have this model.");
-                                        else Console.WriteLine($"You should reserve: {ans}");
+                                        else
+                                            Console.WriteLine($"You should reserve: {ans}");
                                     }
 
                                     else
@@ -641,12 +526,15 @@ namespace TrainCsharp
                             }
                         }
                         break;
-                    default: Console.WriteLine("Wrong command!");
+                    default:
+                        Console.WriteLine("Wrong command!");
                         break;
                     case 101: //read db
                         {
-                            flights = new CRUD<Flight>().Read();
-                            list = new CRUD<ParkInfo>("park.json").Read();
+                            flights = new CRUD().Read();
+                            list = JsonConvert.DeserializeObject<LinkedList<ParkInfo>>(File.ReadAllText("park.json"));
+                            filter = new(flights, list);
+
                             if (flights.Count == 0 || list.Count == 0) { Console.WriteLine("Empty!"); break; }
 
                             Console.WriteLine("\nFlights info:\n--------------------\n");
@@ -662,107 +550,87 @@ namespace TrainCsharp
                         break;
                     case 102: //create in db
                         {
-                            CRUD<Flight> crud = new();
+                            CRUD crud = new();
 
-                            Console.Write("Enter flight id (example: NP-123): ");
-                            string id = Console.ReadLine();
+                            Console.Write("Enter flight id (example: NP-123): "); string id = Console.ReadLine();
 
+                            Console.WriteLine("\nAll types of planes:\n---------------------------");
+                            foreach (var item in Enum.GetValues(typeof(PlaneType)))
+                                Console.WriteLine(item);
+                            Console.WriteLine("---------------------------");
 
-                            Console.Write("Enter model of plane (example: от 0 до 32): ");
+                            Console.Write("Enter model of plane: ");
                             var read = Console.ReadLine();
-                            PlaneType type;
-                            if (Enum.TryParse(read, out type))
+                            if (!Enum.TryParse(read, out PlaneType type))
+                                Console.WriteLine("{0} is not a member of the types enumeration.", read);
+                            else
                             {
                                 if (Enum.IsDefined(typeof(PlaneType), type) | type.ToString().Contains(","))
                                 {
-                                    continue;
+                                    //
                                 }
                                 else
                                     Console.WriteLine("{0} is not an underlying value of the types enumeration.", read);
                             }
-                            else Console.WriteLine("{0} is not a member of the types enumeration.", read);
 
 
-                            Console.Write("Enter date (example: year -> moth -> day): ");
-                            DateTime date = new(Convert.ToInt32(Console.ReadLine()), Convert.ToInt32(Console.ReadLine()), Convert.ToInt32(Console.ReadLine()));
+                            Console.Write("Enter date (example: 2008,02,22): ");
+                            var s = Console.ReadLine().Split(',');
+                            DateTime date = new(Convert.ToInt32(s[0]), Convert.ToInt32(s[1]), Convert.ToInt32(s[2]));
 
-                            Console.WriteLine("Give rating (example: from 0 to 10): ");
+                            Console.Write("Give rating (example: from 0 to 10): ");
                             int status = Convert.ToInt32(Console.ReadLine());
 
-                            Console.WriteLine("Enter ammount of passangers boarded: ");
+                            Console.Write("Enter ammount of passangers boarded: ");
                             int passengers = Convert.ToInt32(Console.ReadLine());
 
-                            Console.WriteLine("Enter ammount of passangers casualties: ");
+                            Console.Write("Enter ammount of passangers casualties: ");
                             int rip = Convert.ToInt32(Console.ReadLine());
 
-                            Flight flight = new() { Id = id, Type = type, Date = date, Passangers = passengers, Status = status, Deaths = rip, base_id = flights.Count };
-                            crud.Add(flight);
-                            flights = crud.Read();
+                            Flight flight = new() { Id = id, Type = type, Date = date, Passengers = passengers, Status = status, Deaths = rip, base_id = flights.Count };
+
+                            flights = crud.Create(flight);
+                            filter = new(flights, list);
                         }
                         break;
                     case 103: //delete from db
                         {
-                            CRUD<Flight> crude = new();
+                            CRUD crude = new();
                             again:
-                            Console.WriteLine("Enter which flight do you want to delete: ");
+                            Console.Write($"Enter which flight do you want to delete: (example: 1 - {flights.Count}): ");
                             int val = Convert.ToInt32(Console.ReadLine());
-                            if (val < flights.Count - 1 && val > 0)
-                                crude.Delete(val);
-                            else { Console.WriteLine($"Wrong position! Enter propper value (example: 0 - {flights.Count - 1}): "); goto again; }
-                            flights = crude.Read();
+                            if (val < flights.Count || val > 0)
+                                flights = crude.Delete(val);
+                            else { Console.WriteLine($"Wrong position! Enter propper value (example: 1 - {flights.Count}): "); goto again; }
+
+                          
+                            filter = new(flights, list);
+
+                            foreach (var item in filter.array)
+                            {
+                                Console.WriteLine(item);
+                            }
                         }
                         break;
                     case 104: //update in db
                         {
-                            CRUD<Flight> hm = new();
+                            CRUD hm = new();
+                            Console.WriteLine("Enter id: ");
+                            int key = Convert.ToInt32(Console.ReadLine());
+                            Console.WriteLine("What do you want to update:" + 
+                                "\nid: Flight id" + 
+                                "\ntype: Model of plane" + 
+                                "\nstatus: Status of plane" + 
+                                "\npassangers: Update ammount of passangers on the board" + 
+                                "\nrip: Update ammount of casualties");
                             gogo:
-                            Console.WriteLine("Which parameter do you want to change?\n" +
-                                              "1.Flight id\n" +
-                                              "2.Model of plane\n" +
-                                              "3.Date\n" +
-                                              "4.Status\n" +
-                                              "5.Ammount of passangers\n" +
-                                              "6.Ammount of casualties");
-                            int k = Convert.ToInt32(Console.ReadLine());
-                            string help = "";
-
-                            switch (k)
-                            {
-                                case 1:
-                                    Console.WriteLine("Change flight id: ");
-                                    help = Console.ReadLine();
-                                    break;
-                                case 2:
-                                    Console.WriteLine("Change model of plane (номер типа: от 0 до 32): ");
-                                    help = Console.ReadLine();
-                                    break;
-                                case 3:
-                                    Console.WriteLine("Change date (год -> месяц -> число: ");
-                                    help = Console.ReadLine();
-                                    break;
-                                case 4:
-                                    Console.WriteLine("Change status (по шкале от 0 до 10): ");
-                                    help = Console.ReadLine();
-                                    break;
-                                case 5:
-                                    Console.WriteLine("Change ammount of passnagers: ");
-                                    help = Console.ReadLine();
-                                    break;
-                                case 6:
-                                    Console.WriteLine("Change ammount of casualties: ");
-                                    help = Console.ReadLine();
-                                    break;
-                                default:
-                                    Console.WriteLine("Error command! Try again: "); goto gogo;
-                                    break;
-                            }
-
+                            string help = Console.ReadLine();
                             if (string.IsNullOrEmpty(help) || string.IsNullOrWhiteSpace(help))
                             {
-                                Console.WriteLine("Value cannot be empty or whitespace!");
+                                Console.WriteLine("Value cannot be empty or white space!");
                                 goto gogo;
                             }
-                            else { hm.Update(k, help); flights = hm.Read(); }
+                            else { flights = hm.Update(key, help); filter = new(flights, list); }
                         }
                         break;
                     case 1337:
@@ -770,7 +638,7 @@ namespace TrainCsharp
                         Help();
                         break;
                 }
-            } while (isRunning);          
+            } while (isRunning);
         }
     }
 }
