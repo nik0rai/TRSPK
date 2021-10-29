@@ -1,0 +1,22 @@
+[
+    {
+      "type": 1,
+      "seats": 150,
+      "ammount": 5
+    },
+    {
+      "type": 11,
+      "seats": 250,
+      "ammount": 7
+    },
+    {
+      "type": 22,
+      "seats": 200,
+      "ammount": 2
+    },
+    {
+      "type": 0,
+      "seats": 121,
+      "ammount": 12
+    }
+  ]
